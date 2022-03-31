@@ -462,8 +462,8 @@ public class BleModule implements BleAdapter {
 
         final RxBleDevice device = rxBleClient.getBleDevice(deviceIdentifier);
 
-        if (connectingDevices.removeSubscription(deviceIdentifier) && device != null) {
-            onSuccessCallback.onSuccess(rxBleDeviceToDeviceMapper.map(device, null));
+        if (connectingDevices.removeDisposable(deviceIdentifier) && device != null) {
+            onSuccessCallback.onSuccess(rxBleDeviceToDeviceMapper.map(device));
         } else {
             if (device == null) {
                 onErrorCallback.onError(BleErrorUtils.deviceNotFound(deviceIdentifier));
@@ -1247,7 +1247,7 @@ public class BleModule implements BleAdapter {
                     public void accept(com.polidea.rxandroidble2.scan.ScanResult scanResult) {
                         String deviceId = scanResult.getBleDevice().getMacAddress();
                         if (!discoveredDevices.containsKey(deviceId)) {
-                            discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice(), null));
+                            discoveredDevices.put(deviceId, rxBleDeviceToDeviceMapper.map(scanResult.getBleDevice()));
                         }
                         onEventCallback.onEvent(rxScanResultToScanResultMapper.map(scanResult));
                     }
