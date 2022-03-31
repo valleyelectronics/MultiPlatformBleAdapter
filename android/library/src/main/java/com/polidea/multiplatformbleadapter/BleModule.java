@@ -52,6 +52,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import java.util.concurrent.Callable;
@@ -60,6 +61,7 @@ import io.reactivex.functions.Predicate;
 import io.reactivex.internal.observers.CallbackCompletableObserver;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.polidea.multiplatformbleadapter.utils.Constants.BluetoothState;
@@ -111,6 +113,19 @@ public class BleModule implements BleAdapter {
         this.context = context;
         bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
+
+        // Handle exceptions according to
+        // https://github.com/dariuszseweryn/RxAndroidBle/wiki/FAQ:-UndeliverableException
+        RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Exception {
+                if (throwable instanceof UndeliverableException && throwable.getCause() instanceof BleException) {
+                    return; // ignore BleExceptions as they were surely delivered at least once
+                }
+                // add other custom handlers if needed
+                throw new RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable);
+            }
+        });
     }
 
     @Override
