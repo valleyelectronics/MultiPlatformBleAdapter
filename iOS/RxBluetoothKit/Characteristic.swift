@@ -93,6 +93,12 @@ public class Characteristic {
     /// Immediately after that `.Complete` is called. Result of this call is not checked, so as a user you are not sure
     /// if everything completed successfully. Errors are not emitted
     public func writeValue(_ data: Data, type: CBCharacteristicWriteType) -> Observable<Characteristic> {
+        var it = data.makeIterator()
+        var result = ""
+        while let num = it.next() {
+            result += result.appendingFormat("%02hhx", num)
+        }
+        NSLog("Written bytes %s", result)
         return service.peripheral.writeValue(data, for: self, type: type)
     }
 
