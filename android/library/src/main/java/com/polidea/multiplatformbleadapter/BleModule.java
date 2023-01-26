@@ -12,6 +12,8 @@ import android.os.ParcelUuid;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import android.util.Log;
 import android.util.SparseArray;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
@@ -119,14 +121,9 @@ public class BleModule implements BleAdapter {
         RxJavaPlugins.setErrorHandler(new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                if (throwable instanceof UndeliverableException && throwable.getCause() instanceof BleException) {
-                    return; // ignore BleExceptions as they were surely delivered at least once
-                }
-                // add other custom handlers if needed
-                // throw new RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable);
-
                 // https://github.com/valleyelectronics/react-native-daysy/issues/1439
                 // do not throw any Exceptions since these can happen in any situation, writing, disconnecting etc.
+                Log.w("BleModule","Undeliverable exception received in RxJavaPlugins error handler", throwable);
                 return;
             }
         });
