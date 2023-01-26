@@ -123,7 +123,11 @@ public class BleModule implements BleAdapter {
                     return; // ignore BleExceptions as they were surely delivered at least once
                 }
                 // add other custom handlers if needed
-                throw new RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable);
+                // throw new RuntimeException("Unexpected Throwable in RxJavaPlugins error handler", throwable);
+
+                // https://github.com/valleyelectronics/react-native-daysy/issues/1439
+                // do not throw any Exceptions since these can happen in any situation, writing, disconnecting etc.
+                return;
             }
         });
     }
